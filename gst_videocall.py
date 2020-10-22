@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 
 import sys, os
@@ -33,6 +32,8 @@ class Sending_Pipeline:
 
 
     def __init__(self):
+        """ Creates a sending pipeline """
+
         # Elements is a list of dictionaries, in which the
         # name key defines the element and the rest are properties
         elements = []
@@ -89,32 +90,31 @@ class Sending_Pipeline:
         return self.player.get_bus()
 
 
-class GTK_Main:
+class AppWindow(Gtk.Window):
     """ The main Gtk application window """
     def __init__(self):
-        window = Gtk.Window(Gtk.WindowType.TOPLEVEL)
-        window.set_title("GST Videocall application")
-        window.set_default_size(500, 400)
-        window.connect("destroy", Gtk.main_quit, "WM destroy")
+        Gtk.Window.__init__(self, title="GST Videocall application")
+        self.set_default_size(500, 400)
+        self.connect("destroy", Gtk.main_quit, "WM destroy")
         vbox = Gtk.VBox()
-        window.add(vbox)
+        self.add(vbox)
         self.movie_window = Gtk.DrawingArea()
         vbox.add(self.movie_window)
         hbox = Gtk.HBox()
         vbox.pack_start(hbox, False, False, 0)
         hbox.set_border_width(10)
         hbox.pack_start(Gtk.Label(), False, False, 0)
-        self.button = Gtk.Button("Start")
+        self.button = Gtk.Button(label="Start")
         self.button.connect("clicked", self.start_stop)
         hbox.pack_start(self.button, False, False, 0)
-        self.button2 = Gtk.Button("Quit")
+        self.button2 = Gtk.Button(label="Quit")
         self.button2.connect("clicked", self.exit)
         hbox.pack_start(self.button2, False, False, 0)
-        self.button3 = Gtk.Button("Silence!")
+        self.button3 = Gtk.Button(label="Silence!")
         self.button3.connect("clicked", self.silence)
         hbox.pack_start(self.button3, False, False, 0)
         hbox.add(Gtk.Label())
-        window.show_all()
+        self.show_all()
 
         self.sending = Sending_Pipeline()
         bus = self.sending.get_bus()
@@ -165,6 +165,9 @@ class GTK_Main:
 
 if __name__ == '__main__':
     Gst.init(None)
-    GTK_Main()
-    GObject.threads_init()
-    Gtk.main()
+    w = AppWindow()
+    # TODO: Deprecated but not sure how to ensure / require having 3.11
+    # Message: PyGIDeprecationWarning: Since version 3.11, calling threads_init
+    #          is no longer needed. See: https://wiki.gnome.org/PyGObject/Threading
+    #GObject.threads_init()
+    p = Gtk.main()
